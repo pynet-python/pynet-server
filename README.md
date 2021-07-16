@@ -2,7 +2,7 @@
 ---
 
 ### Introduction
-Servers are the base of PyNet, acting like HTTP servers but distributing [DTP](https://github.com/ii-Python/protodtp) responses.
+Servers are the base of PyNet, acting like HTTP servers but distributing [DTP](https://github.com/pynet-python/protodtp) responses.
 To setup a PyNet server you can follow this guide, although this provides a very basic setup.
 
 ### Dependencies
@@ -31,4 +31,4 @@ You can launch the PyNet server like any Python file, eg.:
 `python3 start.py`
 
 Now that you have the server setup, it is recommended to also setup and configure
-the webserver, more info [here](https://github.com/ii-Python/pynet-ws).
+the webserver, more info [here](https://github.com/pynet-python/pynet-ws).
