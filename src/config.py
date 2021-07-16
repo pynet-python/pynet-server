@@ -45,7 +45,11 @@ class Configuration(object):
                     if value < min:
                         return console.exit(1, "[red]'{}' in config.json must be at least {}".format(key, min))
 
-            return self.data[key]
+            if isinstance(value, str):
+                for env in os.environ:
+                    value = value.replace(f"${env}", os.environ[env])
+
+            return value
 
         if default is not None:
             return default

@@ -16,7 +16,7 @@ Clone the server repository with:
 To configure your server, you need to create a `config.json` file.
 The inside of it should look like the following:
 ```json
-{"port": 8282, "filestore": "%HOME/.dtp", "max_mem": "20mb"}
+{"port": 8282, "filestore": "$HOME/.dtp", "max_mem": "20mb"}
 ```
 
 - "port" should be a integer describing what port the PyNet server should run on;
