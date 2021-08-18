@@ -47,7 +47,7 @@ class FileHandler(object):
         host_path = os.path.abspath(os.path.join(self.folder, host))
         file_path = os.path.abspath(os.path.join(host_path, file))
 
-        if self.tounix(os.path.join(self.folder, host)) not in file_path:
+        if self.tounix(os.path.join(self.folder, host)) not in self.tounix(file_path):
             raise DTP_Unauthorized
 
         elif not os.path.isdir(host_path):

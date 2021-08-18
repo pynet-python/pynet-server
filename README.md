@@ -13,7 +13,7 @@ PyNet is built using Python and a few python packages; you will also require git
 ### Setup
 Clone the server repository with:
 
-`$ git clone https://github.com/ii-Python/pynet-server`
+`$ git clone https://github.com/pynet-python/pynet-server`
 
 
 To configure your server, you need to create a `config.json` file.

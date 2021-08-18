@@ -1,5 +1,4 @@
 rich
 psutil
 gevent
-gevent[monitor]
-gevent[dnspython]
+protodtp
