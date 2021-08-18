@@ -7,7 +7,6 @@ import socket
 import gevent
 from dtp import to_bytes
 from .object import Client
-from getpass import getuser
 from src.config import config
 from src.assets.states import states
 from src.internals.files import FileHandler
@@ -52,6 +51,17 @@ class ClientLoop(object):
             UnicodeDecodeError: "Invalid DTP path specified, failed to be decoded as UTF-8."
         }
 
+    def _handle_error(self, error: Exception):
+        ET = type(error)
+        if ET in self._exc_resp:
+            return to_bytes(
+                states.MSC_ERR,
+                {},
+                self._exc_resp[ET].encode("UTF-8")  # Convert to bytes
+            ), ET
+
+        return None, ET
+
     def loop(self, client):
 
         # Infinite loop
@@ -94,27 +104,38 @@ class ClientLoop(object):
                     response = to_bytes(states.SUCCESS, {"filename": filename}, response)
 
                 except Exception as Err:
-                    ET = type(Err)
-                    if ET in self._exc_resp:
-                        response = to_bytes(
-                            states.MSC_ERR,
-                            {},
-                            self._exc_resp[ET].encode("UTF-8")  # Convert to bytes
-                        )
+                    response, ET = self._handle_err(Err)
 
                     # Handle no such file/host
-                    elif ET == DTP_NoSuchHost:
+                    if response is None:
+                        if ET == DTP_NoSuchHost:
+                            response = to_bytes(states.NS_HOST, {}, b"The specified host was not found on this server.")
+
+                        elif ET == DTP_NoSuchFile:
+                            response = to_bytes(states.NS_FILE, {}, b"The specified host does not have the requested file.")
+
+                        elif ET == DTP_Unauthorized:
+                            response = to_bytes(states.NT_AUTH, {}, b"You are not authorized to access this.")
+
+                        # Handle unknown exceptions
+                        else:
+                            raise Err  # Unknown error
+
+            elif operation == "list":
+                try:
+                    host = data.data.decode("UTF-8").strip("./\\")  # Anti-exploit (hopefully)
+                    host_path = os.path.abspath(os.path.join(self.file_handler.folder, host))
+                    if not os.path.isdir(host_path):
                         response = to_bytes(states.NS_HOST, {}, b"The specified host was not found on this server.")
 
-                    elif ET == DTP_NoSuchFile:
-                        response = to_bytes(states.NS_FILE, {}, b"The specified host does not have the requested file.")
+                    response = to_bytes(
+                        states.SUCCESS,
+                        {},
+                        "".join(line for line in (["Hostname Listing:\n"] + ["  {}\n".format(file) for file in os.listdir(host_path)])).encode("UTF-8")
+                    )
 
-                    elif ET == DTP_Unauthorized:
-                        response = to_bytes(states.NT_AUTH, {}, b"You are not authorized to access this.")
-
-                    # Handle unknown exceptions
-                    else:
-                        raise Err  # Unknown error
+                except Exception as Err:
+                    response = self._handle_err(Err)
 
             else:
                 response = to_bytes(
