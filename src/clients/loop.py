@@ -51,7 +51,7 @@ class ClientLoop(object):
             UnicodeDecodeError: "Invalid DTP path specified, failed to be decoded as UTF-8."
         }
 
-    def _handle_error(self, error: Exception):
+    def _handle_err(self, error: Exception):
         ET = type(error)
         if ET in self._exc_resp:
             return to_bytes(
